@@ -15,6 +15,8 @@ rm -rf "$INSTALLED_APP"
 /usr/bin/ditto "$APP_BUNDLE" "$INSTALLED_APP"
 
 /usr/bin/open "$INSTALLED_APP"
+"$ROOT_DIR/script/enable_start_at_login.sh" "$INSTALLED_APP"
 
 echo "Installed and opened: $INSTALLED_APP"
 echo "To reopen later: open \"$INSTALLED_APP\""
+echo "Start at login is enabled."

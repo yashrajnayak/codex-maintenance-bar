@@ -12,6 +12,9 @@ struct MenuBarContentView: View {
     Text(schedule.statusText)
       .font(.caption)
 
+    Text(schedule.loginStatusText)
+      .font(.caption)
+
     Divider()
 
     Button("Audit Now") {
@@ -39,6 +42,18 @@ struct MenuBarContentView: View {
     Button("Schedule Folder") {
       schedule.openScheduleFolder()
     }
+
+    Divider()
+
+    Button("Enable Start at Login") {
+      schedule.enableStartAtLogin()
+    }
+    .disabled(schedule.opensAtLogin)
+
+    Button("Disable Start at Login") {
+      schedule.disableStartAtLogin()
+    }
+    .disabled(!schedule.opensAtLogin)
 
     Divider()
 

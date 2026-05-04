@@ -4,10 +4,13 @@ import Foundation
 @MainActor
 final class ScheduleManager: ObservableObject {
   @Published private(set) var isEnabled = false
+  @Published private(set) var opensAtLogin = false
   @Published private(set) var statusText = "Weekly cleanup off"
+  @Published private(set) var loginStatusText = "Start at login off"
 
   private let fileManager = FileManager.default
   private let label = "io.github.yashrajnayak.codex-maintenance.weekly"
+  private let loginLabel = "io.github.yashrajnayak.codex-maintenance-bar.login"
 
   init() {
     refresh()
@@ -18,7 +21,9 @@ final class ScheduleManager: ObservableObject {
 
   func refresh() {
     isEnabled = fileManager.fileExists(atPath: plistURL.path)
+    opensAtLogin = fileManager.fileExists(atPath: loginPlistURL.path)
     statusText = isEnabled ? "Weekly cleanup on" : "Weekly cleanup off"
+    loginStatusText = opensAtLogin ? "Start at login on" : "Start at login off"
   }
 
   func enableWeeklyCleanup() {
@@ -61,6 +66,36 @@ final class ScheduleManager: ObservableObject {
     }
   }
 
+  func enableStartAtLogin() {
+    do {
+      try writeLoginLaunchAgent(appURL: Bundle.main.bundleURL)
+      try? runLaunchctl(["bootout", launchDomain, loginPlistURL.path], allowFailure: true)
+      try runLaunchctl(["bootstrap", launchDomain, loginPlistURL.path])
+      try runLaunchctl(["enable", "\(launchDomain)/\(loginLabel)"])
+      refresh()
+      loginStatusText = "Start at login on"
+    } catch {
+      refresh()
+      loginStatusText = "Login item failed"
+      NSAlert(error: error).runModal()
+    }
+  }
+
+  func disableStartAtLogin() {
+    do {
+      try? runLaunchctl(["bootout", launchDomain, loginPlistURL.path], allowFailure: true)
+      if fileManager.fileExists(atPath: loginPlistURL.path) {
+        try fileManager.removeItem(at: loginPlistURL)
+      }
+      refresh()
+      loginStatusText = "Start at login off"
+    } catch {
+      refresh()
+      loginStatusText = "Disable login failed"
+      NSAlert(error: error).runModal()
+    }
+  }
+
   private var launchDomain: String {
     "gui/\(getuid())"
   }
@@ -77,6 +112,10 @@ final class ScheduleManager: ObservableObject {
 
   private var plistURL: URL {
     launchAgentsDirectory.appendingPathComponent("\(label).plist")
+  }
+
+  private var loginPlistURL: URL {
+    launchAgentsDirectory.appendingPathComponent("\(loginLabel).plist")
   }
 
   private var scheduledScriptURL: URL {
@@ -139,6 +178,28 @@ final class ScheduleManager: ObservableObject {
     </plist>
     """
     try plist.write(to: plistURL, atomically: true, encoding: .utf8)
+  }
+
+  private func writeLoginLaunchAgent(appURL: URL) throws {
+    try fileManager.createDirectory(at: launchAgentsDirectory, withIntermediateDirectories: true)
+    let plist = """
+    <?xml version="1.0" encoding="UTF-8"?>
+    <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+    <plist version="1.0">
+    <dict>
+      <key>Label</key>
+      <string>\(loginLabel)</string>
+      <key>ProgramArguments</key>
+      <array>
+        <string>/usr/bin/open</string>
+        <string>\(appURL.path)</string>
+      </array>
+      <key>RunAtLoad</key>
+      <true/>
+    </dict>
+    </plist>
+    """
+    try plist.write(to: loginPlistURL, atomically: true, encoding: .utf8)
   }
 
   private func resolveScriptURL() -> URL? {

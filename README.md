@@ -11,6 +11,8 @@ It lives in the status bar, not the Dock. Look for the small hammer/checkmark ic
 - `Enable Weekly Cleanup`: installs a macOS LaunchAgent that runs cleanup every Monday at 9:00 AM.
 - `Disable Weekly Cleanup`: removes the LaunchAgent.
 - `Schedule Folder`: opens the LaunchAgent log/script folder.
+- `Enable Start at Login`: opens the menu bar app automatically after login/restart.
+- `Disable Start at Login`: removes that login LaunchAgent.
 - `Open Latest Report`: opens the newest Markdown maintenance report.
 - `Reports Folder`: opens `~/.codex/maintenance_reports`.
 - `Backups Folder`: opens `~/.codex/maintenance_backups`.
@@ -34,6 +36,8 @@ This builds the app, installs it to:
 
 and opens it.
 
+`install.sh` also enables start at login, so the menu bar app reappears after a restart.
+
 ## Reopen After Quitting
 
 If you click `Quit` in the menu bar app, the icon disappears. To open it again:
@@ -49,6 +53,38 @@ or from this repo:
 ```
 
 You can also open `~/Applications` in Finder and double-click `CodexMaintenanceBar.app`.
+
+## Open Automatically After Restart
+
+The app uses a LaunchAgent login item:
+
+```text
+~/Library/LaunchAgents/io.github.yashrajnayak.codex-maintenance-bar.login.plist
+```
+
+Enable it from the menu bar app:
+
+```text
+Enable Start at Login
+```
+
+or from Terminal:
+
+```sh
+./script/enable_start_at_login.sh
+```
+
+Disable it with:
+
+```sh
+./script/disable_start_at_login.sh
+```
+
+Check whether it is loaded:
+
+```sh
+launchctl print "gui/$(id -u)/io.github.yashrajnayak.codex-maintenance-bar.login"
+```
 
 ## Run Without Installing
 
