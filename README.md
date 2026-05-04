@@ -6,8 +6,8 @@ It lives in the status bar, not the Dock. Look for the small hammer/checkmark ic
 
 ## What It Does
 
-- `Audit Now`: read-only check of Codex sessions, logs, config, and workspaces.
-- `Cleanup Now`: closes Codex first, backs up state, archives stale sessions, rotates logs, prunes dead config paths, and writes a report.
+- `Audit Now`: read-only check of Codex sessions, logs, config, and workspaces. Opens the report when finished.
+- `Cleanup Now`: closes Codex first, backs up state, archives stale sessions, rotates logs, prunes dead config paths, writes a report, and opens it when finished.
 - `Open Latest Report`: opens the newest Markdown maintenance report.
 - `Reports Folder`: opens `~/.codex/maintenance_reports`.
 - `Backups Folder`: opens `~/.codex/maintenance_backups`.

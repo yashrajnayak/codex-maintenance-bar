@@ -94,8 +94,9 @@ final class MaintenanceRunner: ObservableObject {
     Task {
       let result = await runScript(mode)
       await MainActor.run {
+        let reportURL = result.reportURL ?? self.latestFile(in: self.reportsDirectory, extension: "md")
         self.lastOutput = result.output
-        self.lastReportURL = result.reportURL ?? self.latestFile(in: self.reportsDirectory, extension: "md")
+        self.lastReportURL = reportURL
         self.lastBackupURL = result.backupURL
 
         if result.succeeded {
@@ -104,6 +105,10 @@ final class MaintenanceRunner: ObservableObject {
         } else {
           self.state = .failed(mode)
           self.statusText = "\(mode.displayName) failed (\(result.exitCode))"
+        }
+
+        if let reportURL {
+          NSWorkspace.shared.open(reportURL)
         }
       }
     }
