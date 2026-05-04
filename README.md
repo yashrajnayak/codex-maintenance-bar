@@ -73,6 +73,34 @@ open dist/CodexMaintenanceBar.app
 ./script/build_and_run.sh --verify
 ```
 
+## Keeping The Script In Sync
+
+`codex-maintenance` is the source of truth for the cleanup script. This app keeps a bundled copy at:
+
+```text
+Sources/CodexMaintenanceBar/Resources/codex_weekly_maintenance.py
+```
+
+When the maintenance script changes upstream, update this app with:
+
+```sh
+./script/sync_maintenance_script.sh
+```
+
+Then commit and push the result.
+
+CI also checks this automatically:
+
+```sh
+./script/sync_maintenance_script.sh --check
+```
+
+For local development against a sibling checkout:
+
+```sh
+LOCAL_SOURCE=/path/to/codex-maintenance ./script/sync_maintenance_script.sh
+```
+
 ## Important Safety Note
 
 `Cleanup Now` closes the Codex desktop app before touching its local state database. That means any active Codex chat window may disappear during cleanup.

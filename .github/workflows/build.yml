@@ -9,5 +9,7 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v5
+      - name: Check bundled maintenance script
+        run: ./script/sync_maintenance_script.sh --check
       - name: Build
         run: swift build
