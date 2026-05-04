@@ -10,6 +10,14 @@ It lives in the status bar, not the Dock. Look for the small hammer/checkmark ic
 
 `codex-maintenance-bar` is the macOS control surface. It bundles the cleanup script from [codex-maintenance](https://github.com/yashrajnayak/codex-maintenance), runs it manually from the status bar, and can install LaunchAgents for weekly cleanup and start-at-login.
 
+## How This Keeps Codex Fast
+
+Codex Desktop can feel slower when local active history, session transcripts, logs, stale workspaces, and dead project config build up over time. The menu bar app keeps that maintenance boring: run an audit, run cleanup, schedule weekly cleanup, and open the report afterward.
+
+Cleanup helps by closing Codex first, backing up local state, archiving old non-pinned active chats, updating the local state database, creating handoff docs, moving stale workspaces to an archive folder, rotating oversized logs, and pruning config entries for missing paths.
+
+This does not change model speed, network latency, cloud service behavior, or the size of the currently open chat before it is archived. It reports heavy background Node/dev-server processes, but it does not kill them automatically.
+
 ## Related Repositories
 
 - [codex-maintenance-bar](https://github.com/yashrajnayak/codex-maintenance-bar): this repo, the macOS menu bar app for manual cleanup, scheduling, and start-at-login.
