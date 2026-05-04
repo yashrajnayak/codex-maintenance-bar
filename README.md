@@ -8,6 +8,9 @@ It lives in the status bar, not the Dock. Look for the small hammer/checkmark ic
 
 - `Audit Now`: read-only check of Codex sessions, logs, config, and workspaces. Opens the report when finished.
 - `Cleanup Now`: closes Codex first, backs up state, archives stale sessions, rotates logs, prunes dead config paths, writes a report, and opens it when finished.
+- `Enable Weekly Cleanup`: installs a macOS LaunchAgent that runs cleanup every Monday at 9:00 AM.
+- `Disable Weekly Cleanup`: removes the LaunchAgent.
+- `Schedule Folder`: opens the LaunchAgent log/script folder.
 - `Open Latest Report`: opens the newest Markdown maintenance report.
 - `Reports Folder`: opens `~/.codex/maintenance_reports`.
 - `Backups Folder`: opens `~/.codex/maintenance_backups`.
@@ -99,6 +102,47 @@ For local development against a sibling checkout:
 
 ```sh
 LOCAL_SOURCE=/path/to/codex-maintenance ./script/sync_maintenance_script.sh
+```
+
+## Weekly Schedule
+
+The app can install a user LaunchAgent so cleanup runs even when the menu bar app is not open.
+
+From the menu bar app, click:
+
+```text
+Enable Weekly Cleanup
+```
+
+This creates:
+
+```text
+~/Library/LaunchAgents/io.github.yashrajnayak.codex-maintenance.weekly.plist
+```
+
+and copies the bundled maintenance script to:
+
+```text
+~/Library/Application Support/CodexMaintenanceBar/codex_weekly_maintenance.py
+```
+
+The schedule runs every Monday at 9:00 AM and executes the script directly:
+
+```sh
+/usr/bin/python3 ~/Library/Application\ Support/CodexMaintenanceBar/codex_weekly_maintenance.py --quit-codex --force-quit-codex --apply --write-report
+```
+
+You can also enable or disable the schedule from Terminal:
+
+```sh
+./script/enable_weekly_cleanup.sh
+./script/disable_weekly_cleanup.sh
+```
+
+Scheduled-run logs live in:
+
+```text
+~/Library/Application Support/CodexMaintenanceBar/
 ```
 
 ## Important Safety Note

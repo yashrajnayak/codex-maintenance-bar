@@ -3,9 +3,13 @@ import SwiftUI
 
 struct MenuBarContentView: View {
   @ObservedObject var runner: MaintenanceRunner
+  @ObservedObject var schedule: ScheduleManager
 
   var body: some View {
     Text(runner.statusText)
+      .font(.caption)
+
+    Text(schedule.statusText)
       .font(.caption)
 
     Divider()
@@ -19,6 +23,22 @@ struct MenuBarContentView: View {
       runner.runCleanup()
     }
     .disabled(runner.isRunning)
+
+    Divider()
+
+    Button("Enable Weekly Cleanup") {
+      schedule.enableWeeklyCleanup()
+    }
+    .disabled(schedule.isEnabled)
+
+    Button("Disable Weekly Cleanup") {
+      schedule.disableWeeklyCleanup()
+    }
+    .disabled(!schedule.isEnabled)
+
+    Button("Schedule Folder") {
+      schedule.openScheduleFolder()
+    }
 
     Divider()
 
