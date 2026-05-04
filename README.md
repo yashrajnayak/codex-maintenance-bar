@@ -4,6 +4,11 @@ A small macOS menu bar app for running Codex local maintenance.
 
 It lives in the status bar, not the Dock. Look for the small hammer/checkmark icon near the clock.
 
+## Related Repositories
+
+- [codex-maintenance-bar](https://github.com/yashrajnayak/codex-maintenance-bar): this repo, the macOS menu bar app for manual cleanup, scheduling, and start-at-login.
+- [codex-maintenance](https://github.com/yashrajnayak/codex-maintenance): source-of-truth cleanup script and Codex skill bundled by this app.
+
 ## What It Does
 
 - `Audit Now`: read-only check of Codex sessions, logs, config, and workspaces. Opens the report when finished.
