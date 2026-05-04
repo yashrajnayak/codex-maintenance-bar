@@ -1,18 +1,55 @@
 # Codex Maintenance Bar
 
-A tiny macOS menu bar app for running Codex local maintenance.
+A small macOS menu bar app for running Codex local maintenance.
 
-It can:
+It lives in the status bar, not the Dock. Look for the small hammer/checkmark icon near the clock.
 
-- Run a safe audit and write a report.
-- Run cleanup by quitting Codex first, backing up state, archiving stale sessions, rotating logs, pruning dead config projects, and writing a report.
-- Open the latest maintenance report.
-- Open report and backup folders.
-- Copy the last command output.
+## What It Does
 
-The app bundles the `codex_weekly_maintenance.py` script, so it does not require the Codex skill to be installed.
+- `Audit Now`: read-only check of Codex sessions, logs, config, and workspaces.
+- `Cleanup Now`: closes Codex first, backs up state, archives stale sessions, rotates logs, prunes dead config paths, and writes a report.
+- `Open Latest Report`: opens the newest Markdown maintenance report.
+- `Reports Folder`: opens `~/.codex/maintenance_reports`.
+- `Backups Folder`: opens `~/.codex/maintenance_backups`.
+- `Copy Last Output`: copies the last script output to the clipboard.
 
-## Build And Run
+The app bundles the maintenance script, so it does not require the Codex skill to be installed.
+
+## Install
+
+From this repo:
+
+```sh
+./script/install.sh
+```
+
+This builds the app, installs it to:
+
+```text
+~/Applications/CodexMaintenanceBar.app
+```
+
+and opens it.
+
+## Reopen After Quitting
+
+If you click `Quit` in the menu bar app, the icon disappears. To open it again:
+
+```sh
+open ~/Applications/CodexMaintenanceBar.app
+```
+
+or from this repo:
+
+```sh
+./script/open_app.sh
+```
+
+You can also open `~/Applications` in Finder and double-click `CodexMaintenanceBar.app`.
+
+## Run Without Installing
+
+Build and launch from the repo:
 
 ```sh
 ./script/build_and_run.sh
@@ -24,18 +61,28 @@ The built app bundle is staged at:
 dist/CodexMaintenanceBar.app
 ```
 
+If you quit it, reopen the staged build with:
+
+```sh
+open dist/CodexMaintenanceBar.app
+```
+
 ## Verify
 
 ```sh
 ./script/build_and_run.sh --verify
 ```
 
-## Safety
+## Important Safety Note
 
-The cleanup action intentionally closes Codex before touching its local state database:
+`Cleanup Now` closes the Codex desktop app before touching its local state database. That means any active Codex chat window may disappear during cleanup.
+
+Run `Audit Now` first if you want a read-only preview.
+
+Under the hood, cleanup runs:
 
 ```sh
 python3 codex_weekly_maintenance.py --quit-codex --force-quit-codex --apply --write-report
 ```
 
-Run audit first if you want a read-only look at what cleanup would do.
+The menu bar app itself stays open unless you click `Quit`.
