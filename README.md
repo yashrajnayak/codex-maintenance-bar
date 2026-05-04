@@ -4,6 +4,16 @@ A small macOS menu bar app for running Codex local maintenance.
 
 It lives in the status bar, not the Dock. Look for the small hammer/checkmark icon near the clock.
 
+## Visual Overview
+
+![Codex Maintenance Bar overview](docs/assets/codex-maintenance-bar-overview.png)
+
+## Architecture
+
+![Codex Maintenance Bar architecture](docs/assets/codex-maintenance-bar-architecture.svg)
+
+`codex-maintenance-bar` is the macOS control surface. It bundles the cleanup script from [codex-maintenance](https://github.com/yashrajnayak/codex-maintenance), runs it manually from the status bar, and can install LaunchAgents for weekly cleanup and start-at-login.
+
 ## Related Repositories
 
 - [codex-maintenance-bar](https://github.com/yashrajnayak/codex-maintenance-bar): this repo, the macOS menu bar app for manual cleanup, scheduling, and start-at-login.
