@@ -270,7 +270,7 @@ CI runs the same check.
 
 ```sh
 ./script/sync_maintenance_script.sh --check
-python3 -m py_compile codex_weekly_maintenance.py codex-maintenance/scripts/codex_weekly_maintenance.py Sources/CodexPowertoyz/Resources/*.py tests/test_codex_weekly_maintenance.py
+python3 -m py_compile codex_weekly_maintenance.py codex-maintenance/scripts/codex_weekly_maintenance.py Sources/CodexPowertoyz/Resources/*.py tests/*.py
 python3 -m unittest discover -s tests -v
 ./script/build_and_run.sh --verify
 ```

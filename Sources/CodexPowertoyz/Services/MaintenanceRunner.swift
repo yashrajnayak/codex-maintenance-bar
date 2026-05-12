@@ -138,7 +138,7 @@ final class MaintenanceRunner: ObservableObject {
     Task {
       let result = await runScript(mode)
       await MainActor.run {
-        let reportURL = result.reportURL ?? self.latestFile(in: self.reportsDirectory, extension: "md")
+        let reportURL = result.reportURL
         let resultText = self.displayText(for: result, reportURL: reportURL)
         self.lastOutput = result.output
         self.lastResultText = resultText

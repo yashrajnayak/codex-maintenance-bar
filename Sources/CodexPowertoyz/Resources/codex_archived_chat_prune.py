@@ -44,6 +44,17 @@ def utc_timestamp() -> str:
     return datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
 
 
+def is_codex_process_command(command: str) -> bool:
+    command = command.strip()
+    return (
+        "/Applications/Codex.app/" in command
+        or command == "codex app-server"
+        or command.endswith(" codex app-server")
+        or command.endswith("/codex app-server")
+        or "Contents/Resources/codex app-server" in command
+    )
+
+
 def codex_is_running() -> tuple[bool, list[str]]:
     result = subprocess.run(
         ["ps", "-axo", "pid=,command="],
@@ -53,13 +64,12 @@ def codex_is_running() -> tuple[bool, list[str]]:
     )
     hits = []
     for line in result.stdout.splitlines():
-        command = line.strip()
-        if (
-            "/Applications/Codex.app/" in command
-            or command.endswith(" codex app-server")
-            or "Contents/Resources/codex app-server" in command
-        ):
-            hits.append(command)
+        parts = line.strip().split(None, 1)
+        if len(parts) != 2:
+            continue
+        _, command = parts
+        if is_codex_process_command(command):
+            hits.append(line.strip())
     return bool(hits), hits
 
 
@@ -76,11 +86,7 @@ def codex_process_ids() -> list[int]:
         if len(parts) != 2:
             continue
         pid_text, command = parts
-        if (
-            "/Applications/Codex.app/" in command
-            or command.endswith(" codex app-server")
-            or "Contents/Resources/codex app-server" in command
-        ):
+        if is_codex_process_command(command):
             try:
                 pids.append(int(pid_text))
             except ValueError:
@@ -128,6 +134,11 @@ def quit_codex(force: bool) -> list[str]:
             except OSError:
                 pass
         actions.append("Sent SIGKILL to remaining Codex process(es).")
+        for _ in range(10):
+            if not codex_is_running()[0]:
+                actions.append("Codex exited after SIGKILL.")
+                return actions
+            time.sleep(1)
 
     return actions
 
