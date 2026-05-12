@@ -164,6 +164,11 @@ struct MenuBarContentView: View {
 
   @ViewBuilder
   private var reportSection: some View {
+    Button("Show Last Result") {
+      runner.showLastResult()
+    }
+    .disabled(runner.lastResultText.isEmpty)
+
     Button("Open Latest Report") {
       runner.openLatestReport()
     }
@@ -176,10 +181,10 @@ struct MenuBarContentView: View {
       runner.openBackupsFolder()
     }
 
-    Button("Copy Last Output") {
-      runner.copyLastOutput()
+    Button("Copy Last Result") {
+      runner.copyLastResult()
     }
-    .disabled(runner.lastOutput.isEmpty)
+    .disabled(runner.lastResultText.isEmpty && runner.lastOutput.isEmpty)
   }
 
   private func confirm(title: String, message: String) -> Bool {

@@ -27,14 +27,15 @@ The app launches bundled Python helpers for manual audits and cleanups, wraps ma
 - `Keep Awake Until Stopped`: starts a manual awake session.
 - `Keep Awake for 1 Hour` / `Keep Awake for 2 Hours`: starts a timed awake session.
 - `Stop Keeping Awake`: stops the active awake session.
-- `Audit Now`: read-only check of Codex sessions, logs, config, and workspaces. Opens the report when finished.
-- `Cleanup Now`: closes Codex first, backs up state, archives stale active sessions, rotates logs, prunes dead config paths, writes a report, and opens it when finished.
+- `Audit Now`: read-only check of Codex sessions, logs, config, and workspaces. Shows a native result window when finished.
+- `Cleanup Now`: closes Codex first, backs up state, archives stale active sessions, rotates logs, prunes dead config paths, writes a report, and shows a native result window when finished.
 - `Audit Workspace Artifacts`: dry-runs a manifest-backed pass over `~/Documents/Codex` for regenerable build/dependency/cache folders, exact duplicate older version files, and derived page renders.
 - `Clean Workspace Artifacts`: removes only those generated workspace artifacts after writing a CSV manifest and Markdown report.
 - `Audit Archived Chats`: previews archived chat transcript removal and shows how much space archived transcripts use.
 - `Prune Archived Chats`: closes Codex, backs up archived transcripts and state, removes archived chat transcript files, deletes archived rows from the local state database, updates the session index, and verifies database integrity.
 - `Enable Weekly Cleanup`: installs a macOS LaunchAgent that runs cleanup every Monday at 9:00 AM.
 - `Enable Start at Login`: opens the menu bar app automatically after login/restart.
+- `Show Last Result`: reopens the latest in-app result window without launching a code editor.
 
 ## How Awake Mode Works
 

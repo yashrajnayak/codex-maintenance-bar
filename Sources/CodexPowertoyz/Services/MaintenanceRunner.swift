@@ -1,15 +1,20 @@
 import AppKit
 import Foundation
+import SwiftUI
 
 @MainActor
 final class MaintenanceRunner: ObservableObject {
   @Published private(set) var state: MaintenanceState = .idle
   @Published private(set) var statusText = "Ready"
   @Published private(set) var lastOutput = ""
+  @Published private(set) var lastResultText = ""
   @Published private(set) var lastReportURL: URL?
   @Published private(set) var lastBackupURL: URL?
 
   private let fileManager = FileManager.default
+  private var resultWindow: NSWindow?
+  private var lastResultTitle = ""
+  private var lastResultSubtitle = ""
 
   var isRunning: Bool {
     if case .running = state {
@@ -96,13 +101,28 @@ final class MaintenanceRunner: ObservableObject {
     openFolder(codexHome.appendingPathComponent("maintenance_backups"))
   }
 
-  func copyLastOutput() {
-    guard !lastOutput.isEmpty else {
+  func copyLastResult() {
+    let text = lastResultText.isEmpty ? lastOutput : lastResultText
+    guard !text.isEmpty else {
       NSSound.beep()
       return
     }
     NSPasteboard.general.clearContents()
-    NSPasteboard.general.setString(lastOutput, forType: .string)
+    NSPasteboard.general.setString(text, forType: .string)
+  }
+
+  func showLastResult() {
+    guard !lastResultText.isEmpty else {
+      NSSound.beep()
+      return
+    }
+    presentResultWindow(
+      title: lastResultTitle,
+      subtitle: lastResultSubtitle,
+      text: lastResultText,
+      reportURL: lastReportURL,
+      backupURL: lastBackupURL
+    )
   }
 
   private func run(_ mode: MaintenanceMode) {
@@ -113,12 +133,15 @@ final class MaintenanceRunner: ObservableObject {
     state = .running(mode)
     statusText = "Running \(mode.displayName.lowercased())..."
     lastOutput = ""
+    lastResultText = ""
 
     Task {
       let result = await runScript(mode)
       await MainActor.run {
         let reportURL = result.reportURL ?? self.latestFile(in: self.reportsDirectory, extension: "md")
+        let resultText = self.displayText(for: result, reportURL: reportURL)
         self.lastOutput = result.output
+        self.lastResultText = resultText
         self.lastReportURL = reportURL
         self.lastBackupURL = result.backupURL
 
@@ -130,9 +153,15 @@ final class MaintenanceRunner: ObservableObject {
           self.statusText = "\(mode.displayName) failed (\(result.exitCode))"
         }
 
-        if let reportURL {
-          NSWorkspace.shared.open(reportURL)
-        }
+        self.lastResultTitle = "\(mode.displayName) \(result.succeeded ? "Finished" : "Failed")"
+        self.lastResultSubtitle = result.succeeded ? "Exit code 0" : "Exit code \(result.exitCode)"
+        self.presentResultWindow(
+          title: self.lastResultTitle,
+          subtitle: self.lastResultSubtitle,
+          text: resultText,
+          reportURL: reportURL,
+          backupURL: result.backupURL
+        )
       }
     }
   }
@@ -268,5 +297,53 @@ final class MaintenanceRunner: ObservableObject {
   private func modificationDate(_ url: URL) -> Date {
     let values = try? url.resourceValues(forKeys: [.contentModificationDateKey])
     return values?.contentModificationDate ?? .distantPast
+  }
+
+  private func displayText(for result: MaintenanceResult, reportURL: URL?) -> String {
+    if let reportURL,
+       let report = try? String(contentsOf: reportURL, encoding: .utf8),
+       !report.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+      return report
+    }
+
+    let trimmedOutput = result.output.trimmingCharacters(in: .whitespacesAndNewlines)
+    if trimmedOutput.isEmpty {
+      return "\(result.mode.displayName) finished with exit code \(result.exitCode)."
+    }
+    return trimmedOutput
+  }
+
+  private func presentResultWindow(
+    title: String,
+    subtitle: String,
+    text: String,
+    reportURL: URL?,
+    backupURL: URL?
+  ) {
+    let content = MaintenanceResultWindowView(
+      title: title,
+      subtitle: subtitle,
+      text: text,
+      reportURL: reportURL,
+      backupURL: backupURL
+    )
+
+    if resultWindow == nil {
+      let window = NSWindow(
+        contentRect: NSRect(x: 0, y: 0, width: 720, height: 520),
+        styleMask: [.titled, .closable, .miniaturizable, .resizable],
+        backing: .buffered,
+        defer: false
+      )
+      window.title = "codex-powertoyz Result"
+      window.isReleasedWhenClosed = false
+      window.center()
+      resultWindow = window
+    }
+
+    resultWindow?.title = title
+    resultWindow?.contentView = NSHostingView(rootView: content)
+    resultWindow?.makeKeyAndOrderFront(nil)
+    NSApp.activate(ignoringOtherApps: true)
   }
 }
