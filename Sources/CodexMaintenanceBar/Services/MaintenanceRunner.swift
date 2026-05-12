@@ -52,6 +52,22 @@ final class MaintenanceRunner: ObservableObject {
     run(.cleanup)
   }
 
+  func runArtifactAudit() {
+    run(.artifactAudit)
+  }
+
+  func runArtifactCleanup() {
+    run(.artifactCleanup)
+  }
+
+  func runArchivedAudit() {
+    run(.archivedAudit)
+  }
+
+  func runArchivedPrune() {
+    run(.archivedPrune)
+  }
+
   func openLatestReport() {
     if let lastReportURL {
       NSWorkspace.shared.open(lastReportURL)
@@ -115,7 +131,7 @@ final class MaintenanceRunner: ObservableObject {
   }
 
   private nonisolated func runScript(_ mode: MaintenanceMode) async -> MaintenanceResult {
-    let scriptURL = resolveScriptURL()
+    let scriptURL = resolveScriptURL(for: mode)
     let process = Process()
     process.executableURL = URL(fileURLWithPath: "/usr/bin/python3")
     process.arguments = arguments(for: mode, scriptURL: scriptURL)
@@ -155,22 +171,44 @@ final class MaintenanceRunner: ObservableObject {
       return [scriptURL.path, "--write-report"]
     case .cleanup:
       return [scriptURL.path, "--quit-codex", "--force-quit-codex", "--apply", "--write-report"]
+    case .artifactAudit:
+      return [scriptURL.path, "--include-derived-page-renders"]
+    case .artifactCleanup:
+      return [scriptURL.path, "--apply", "--include-derived-page-renders"]
+    case .archivedAudit:
+      return [scriptURL.path]
+    case .archivedPrune:
+      return [scriptURL.path, "--quit-codex", "--force-quit-codex", "--apply"]
     }
   }
 
-  private nonisolated func resolveScriptURL() -> URL {
-    if let bundled = Bundle.main.url(forResource: "codex_weekly_maintenance", withExtension: "py") {
+  private nonisolated func resolveScriptURL(for mode: MaintenanceMode) -> URL {
+    let scriptName = scriptResourceName(for: mode)
+    if let bundled = Bundle.main.url(forResource: scriptName, withExtension: "py") {
       return bundled
     }
 
-    let installed = FileManager.default.homeDirectoryForCurrentUser
-      .appendingPathComponent(".codex/skills/codex-maintenance/scripts/codex_weekly_maintenance.py")
-    if FileManager.default.fileExists(atPath: installed.path) {
-      return installed
+    if mode == .audit || mode == .cleanup {
+      let installed = FileManager.default.homeDirectoryForCurrentUser
+        .appendingPathComponent(".codex/skills/codex-maintenance/scripts/codex_weekly_maintenance.py")
+      if FileManager.default.fileExists(atPath: installed.path) {
+        return installed
+      }
     }
 
     return FileManager.default.homeDirectoryForCurrentUser
-      .appendingPathComponent("codex_weekly_maintenance.py")
+      .appendingPathComponent("\(scriptName).py")
+  }
+
+  private nonisolated func scriptResourceName(for mode: MaintenanceMode) -> String {
+    switch mode {
+    case .audit, .cleanup:
+      return "codex_weekly_maintenance"
+    case .artifactAudit, .artifactCleanup:
+      return "codex_workspace_artifact_cleanup"
+    case .archivedAudit, .archivedPrune:
+      return "codex_archived_chat_prune"
+    }
   }
 
   private nonisolated func extractURL(from output: String, prefix: String) -> URL? {

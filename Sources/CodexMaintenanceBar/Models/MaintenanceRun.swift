@@ -3,6 +3,10 @@ import Foundation
 enum MaintenanceMode: String {
   case audit
   case cleanup
+  case artifactAudit
+  case artifactCleanup
+  case archivedAudit
+  case archivedPrune
 
   var displayName: String {
     switch self {
@@ -10,6 +14,14 @@ enum MaintenanceMode: String {
       return "Audit"
     case .cleanup:
       return "Cleanup"
+    case .artifactAudit:
+      return "Artifact Audit"
+    case .artifactCleanup:
+      return "Artifact Cleanup"
+    case .archivedAudit:
+      return "Archived Chat Audit"
+    case .archivedPrune:
+      return "Archived Chat Prune"
     }
   }
 }

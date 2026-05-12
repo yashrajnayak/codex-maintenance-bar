@@ -1,23 +1,25 @@
 # Codex Maintenance Bar
 
-A macOS menu bar app, standalone maintenance script, and Codex skill for auditing, backing up, archiving, restoring, and safely cleaning local Codex Desktop state.
+A macOS menu bar app, standalone maintenance scripts, and Codex skill for auditing, backing up, archiving, restoring, and safely cleaning local Codex Desktop state.
 
 It lives in the status bar, not the Dock. Look for the small hammer/checkmark icon near the clock.
 
 ## Architecture
 
-![Codex Maintenance Bar architecture: the menu bar app coordinates the bundled Python cleanup script, backups, reports, weekly scheduling, local Codex state, and archived sessions.](assets/readme/architecture-diagram.png)
+![Codex Maintenance Bar architecture: the menu bar app coordinates bundled Python cleanup helpers, backups, reports, weekly scheduling, local Codex state, archived sessions, and workspace artifacts.](assets/readme/architecture-diagram.png)
 
 `codex-maintenance-bar` is now the canonical repo for the whole workflow:
 
 - `Sources/CodexMaintenanceBar`: SwiftUI menu bar app.
-- `codex_weekly_maintenance.py`: canonical maintenance script for CLI use.
-- `Sources/CodexMaintenanceBar/Resources/codex_weekly_maintenance.py`: bundled app copy of the script.
-- `codex-maintenance/`: installable Codex skill with its own script copy.
-- `script/sync_maintenance_script.sh`: keeps all script copies identical.
+- `codex_weekly_maintenance.py`: canonical weekly maintenance script for CLI use.
+- `Sources/CodexMaintenanceBar/Resources/`: bundled app copies of the weekly, workspace-artifact, and archived-chat cleanup helpers.
+- `codex-maintenance/`: installable Codex skill with its own weekly maintenance script copy.
+- `script/sync_maintenance_script.sh`: keeps weekly maintenance script copies identical.
 - `tests/`: regression tests for audit, cleanup, restore, and lock behavior.
 
-The app launches the bundled Python script for manual audits and cleanups. The scheduler installs a user LaunchAgent and copies the same script to Application Support for weekly cleanup. The CLI and Codex skill use the same root script behavior, so the app and automation paths stay boringly consistent.
+The app launches bundled Python helpers for manual audits and cleanups. The scheduler installs a user LaunchAgent and copies the weekly maintenance script to Application Support for recurring cleanup. The CLI and Codex skill use the same root weekly script behavior, while the menu bar app adds focused artifact and archived-chat cleanup actions.
+
+The earlier `Codex Cleaner` prototype was useful for the scan-and-review idea, but this repo is now the recommended merged direction: a menu bar app with deterministic scripts, reports, backups, and confirmations for destructive actions.
 
 ## Screenshot
 
@@ -29,12 +31,18 @@ Codex Desktop can feel slower when local active history, session transcripts, lo
 
 Cleanup helps by closing Codex first, backing up local state, archiving old non-pinned active chats, updating the local state database, creating handoff docs, moving stale workspaces to an archive folder, rotating oversized logs, and pruning config entries for missing paths.
 
+The extra artifact tools handle cleanup work that the weekly maintenance script intentionally avoids: regenerable workspace build folders, virtual environments, Python caches, exact duplicate older version files, derived page-render folders when a final PDF/PPTX exists, and archived chat transcripts after a dedicated backup.
+
 This does not change model speed, network latency, cloud service behavior, or the size of the currently open chat before it is archived. It reports heavy background Node/dev-server processes, but it does not kill them automatically.
 
 ## What It Does
 
 - `Audit Now`: read-only check of Codex sessions, logs, config, and workspaces. Opens the report when finished.
-- `Cleanup Now`: closes Codex first, backs up state, archives stale sessions, rotates logs, prunes dead config paths, writes a report, and opens it when finished.
+- `Cleanup Now`: closes Codex first, backs up state, archives stale active sessions, rotates logs, prunes dead config paths, writes a report, and opens it when finished.
+- `Audit Workspace Artifacts`: dry-runs a manifest-backed pass over `~/Documents/Codex` for regenerable build/dependency/cache folders, exact duplicate older version files, and derived page renders.
+- `Clean Workspace Artifacts`: removes only those generated workspace artifacts after writing a CSV manifest and Markdown report.
+- `Audit Archived Chats`: previews archived chat transcript removal and shows how much space archived transcripts use.
+- `Prune Archived Chats`: closes Codex, backs up archived transcripts and state, removes archived chat transcript files, deletes archived rows from the local state database, updates the session index, and verifies database integrity.
 - `Enable Weekly Cleanup`: installs a macOS LaunchAgent that runs cleanup every Monday at 9:00 AM.
 - `Disable Weekly Cleanup`: removes the LaunchAgent.
 - `Schedule Folder`: opens the LaunchAgent log/script folder.
@@ -121,6 +129,30 @@ Restore a backup:
 
 ```sh
 python3 codex_weekly_maintenance.py --quit-codex --restore-backup /path/to/maintenance_backups/YYYYMMDDTHHMMSSZ
+```
+
+Preview generated workspace artifacts:
+
+```sh
+python3 Sources/CodexMaintenanceBar/Resources/codex_workspace_artifact_cleanup.py --include-derived-page-renders
+```
+
+Clean generated workspace artifacts:
+
+```sh
+python3 Sources/CodexMaintenanceBar/Resources/codex_workspace_artifact_cleanup.py --apply --include-derived-page-renders
+```
+
+Preview archived chat pruning:
+
+```sh
+python3 Sources/CodexMaintenanceBar/Resources/codex_archived_chat_prune.py
+```
+
+Prune archived chats after closing Codex:
+
+```sh
+python3 Sources/CodexMaintenanceBar/Resources/codex_archived_chat_prune.py --quit-codex --force-quit-codex --apply
 ```
 
 ## Codex Skill
@@ -234,13 +266,15 @@ CI runs the same check.
 
 ```sh
 ./script/sync_maintenance_script.sh --check
-python3 -m py_compile codex_weekly_maintenance.py codex-maintenance/scripts/codex_weekly_maintenance.py Sources/CodexMaintenanceBar/Resources/codex_weekly_maintenance.py tests/test_codex_weekly_maintenance.py
+python3 -m py_compile codex_weekly_maintenance.py codex-maintenance/scripts/codex_weekly_maintenance.py Sources/CodexMaintenanceBar/Resources/*.py tests/test_codex_weekly_maintenance.py
 python3 -m unittest discover -s tests -v
 ./script/build_and_run.sh --verify
 ```
 
 ## Important Safety Note
 
-`Cleanup Now` closes the Codex desktop app before touching its local state database. That means any active Codex chat window may disappear during cleanup.
+`Cleanup Now` and `Prune Archived Chats` close the Codex desktop app before touching its local state database. That means any active Codex chat window may disappear during cleanup.
 
-Run `Audit Now` first if you want a read-only preview. Keep backups until you have reopened Codex and confirmed everything looks right.
+Run `Audit Now`, `Audit Workspace Artifacts`, or `Audit Archived Chats` first if you want a read-only preview. Keep backups until you have reopened Codex and confirmed everything looks right.
+
+Archived chat pruning creates a dedicated backup before deleting anything and runs SQLite integrity checks after the database update.

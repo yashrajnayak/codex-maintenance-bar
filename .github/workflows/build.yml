@@ -9,8 +9,8 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v5
-      - name: Check bundled maintenance script
-        run: ./script/sync_maintenance_script.sh --check
+      - name: Check bundled Python scripts
+        run: python3 -m py_compile Sources/CodexMaintenanceBar/Resources/*.py
       - name: Check shell scripts
         run: bash -n script/*.sh
       - name: Build

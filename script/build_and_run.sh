@@ -24,8 +24,8 @@ rm -rf "$APP_BUNDLE"
 mkdir -p "$APP_MACOS" "$APP_RESOURCES"
 cp "$BUILD_BINARY" "$APP_BINARY"
 chmod +x "$APP_BINARY"
-cp "$ROOT_DIR/Sources/CodexMaintenanceBar/Resources/codex_weekly_maintenance.py" "$APP_RESOURCES/codex_weekly_maintenance.py"
-chmod +x "$APP_RESOURCES/codex_weekly_maintenance.py"
+cp "$ROOT_DIR"/Sources/CodexMaintenanceBar/Resources/*.py "$APP_RESOURCES/"
+chmod +x "$APP_RESOURCES"/*.py
 
 cat >"$INFO_PLIST" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
