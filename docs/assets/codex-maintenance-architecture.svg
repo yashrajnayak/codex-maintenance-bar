@@ -1,0 +1,100 @@
+<svg width="1200" height="620" viewBox="0 0 1200 620" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Codex Maintenance architecture</title>
+  <desc id="desc">A diagram showing the maintenance script flow from manual or scheduled trigger through safety checks, backup, inspection, cleanup actions, and reports.</desc>
+  <defs>
+    <filter id="shadow" x="-20%" y="-30%" width="140%" height="170%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#14213d" flood-opacity="0.12"/>
+    </filter>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="strokeWidth">
+      <path d="M2 2L10 6L2 10" stroke="#2f4858" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <style>
+      .bg { fill: #fbfaf7; }
+      .title { fill: #18242f; font: 700 30px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      .subtitle { fill: #54616d; font: 400 16px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      .box { fill: #ffffff; stroke: #d9e0e4; stroke-width: 2; filter: url(#shadow); }
+      .box-alt { fill: #f3fbf9; stroke: #9ed8cd; stroke-width: 2; filter: url(#shadow); }
+      .box-warn { fill: #fff8ec; stroke: #f0c36a; stroke-width: 2; filter: url(#shadow); }
+      .box-out { fill: #f9fbff; stroke: #aabbd4; stroke-width: 2; filter: url(#shadow); }
+      .label { fill: #18242f; font: 700 17px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      .small { fill: #54616d; font: 400 13px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      .code { fill: #334155; font: 600 13px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+      .arrow { stroke: #2f4858; stroke-width: 3; marker-end: url(#arrow); }
+      .dash { stroke: #e86f51; stroke-width: 3; stroke-dasharray: 7 8; marker-end: url(#arrow); }
+      .pill { fill: #e7f5f1; stroke: #a9d8ce; stroke-width: 1.5; }
+      .pill-text { fill: #1f6f63; font: 700 12px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    </style>
+  </defs>
+
+  <rect class="bg" width="1200" height="620" rx="28"/>
+  <text class="title" x="52" y="58">Codex Maintenance</text>
+  <text class="subtitle" x="52" y="86">Safe weekly cleanup for Codex Desktop state, sessions, worktrees, logs, config, and reports.</text>
+
+  <rect class="box" x="52" y="132" width="210" height="118" rx="18"/>
+  <text class="label" x="82" y="171">Trigger</text>
+  <text class="small" x="82" y="199">Manual CLI</text>
+  <text class="small" x="82" y="221">Codex skill</text>
+  <text class="small" x="82" y="243">Weekly scheduler</text>
+
+  <rect class="box-alt" x="332" y="132" width="236" height="118" rx="18"/>
+  <text class="label" x="362" y="171">Maintenance Script</text>
+  <text class="code" x="362" y="200">codex_weekly_maintenance.py</text>
+  <text class="small" x="362" y="226">Audit by default</text>
+
+  <rect class="box-warn" x="638" y="132" width="224" height="118" rx="18"/>
+  <text class="label" x="668" y="171">Safety Gate</text>
+  <text class="small" x="668" y="199">Lockfile</text>
+  <text class="small" x="668" y="221">Codex running check</text>
+  <text class="small" x="668" y="243">Backup before apply</text>
+
+  <rect class="box-out" x="932" y="132" width="216" height="118" rx="18"/>
+  <text class="label" x="962" y="171">Backups</text>
+  <text class="small" x="962" y="199">Config and state DBs</text>
+  <text class="small" x="962" y="221">Sessions and indexes</text>
+  <text class="small" x="962" y="243">Skills and automations</text>
+
+  <path class="arrow" d="M262 191H322"/>
+  <path class="arrow" d="M568 191H628"/>
+  <path class="arrow" d="M862 191H922"/>
+
+  <rect class="box" x="86" y="334" width="230" height="136" rx="18"/>
+  <text class="label" x="116" y="373">Inspect</text>
+  <text class="small" x="116" y="401">Sessions and archives</text>
+  <text class="small" x="116" y="423">State and log DBs</text>
+  <text class="small" x="116" y="445">Config and worktrees</text>
+
+  <rect class="box-alt" x="388" y="334" width="230" height="136" rx="18"/>
+  <text class="label" x="418" y="373">Apply Cleanup</text>
+  <text class="small" x="418" y="401">Archive stale chats</text>
+  <text class="small" x="418" y="423">Prune dead projects</text>
+  <text class="small" x="418" y="445">Move stale worktrees</text>
+
+  <rect class="box-alt" x="690" y="334" width="230" height="136" rx="18"/>
+  <text class="label" x="720" y="373">Normalize</text>
+  <text class="small" x="720" y="401">Rotate large logs</text>
+  <text class="small" x="720" y="423">Fix odd path forms</text>
+  <text class="small" x="720" y="445">Write handoff docs</text>
+
+  <rect class="box-out" x="992" y="334" width="156" height="136" rx="18"/>
+  <text class="label" x="1022" y="373">Report</text>
+  <text class="small" x="1022" y="401">Markdown</text>
+  <text class="small" x="1022" y="423">Summary</text>
+  <text class="small" x="1022" y="445">Next steps</text>
+
+  <path class="arrow" d="M450 250V290C450 315 372 316 316 356"/>
+  <path class="arrow" d="M316 402H378"/>
+  <path class="arrow" d="M618 402H680"/>
+  <path class="arrow" d="M920 402H982"/>
+
+  <path class="dash" d="M750 250V296C750 316 842 314 890 350"/>
+  <text class="small" x="762" y="291">apply mode only</text>
+
+  <rect class="pill" x="86" y="520" width="176" height="38" rx="19"/>
+  <text class="pill-text" x="118" y="544">audit is read-only</text>
+  <rect class="pill" x="286" y="520" width="210" height="38" rx="19"/>
+  <text class="pill-text" x="318" y="544">mutations require apply</text>
+  <rect class="pill" x="520" y="520" width="210" height="38" rx="19"/>
+  <text class="pill-text" x="552" y="544">backups before cleanup</text>
+  <rect class="pill" x="754" y="520" width="254" height="38" rx="19"/>
+  <text class="pill-text" x="786" y="544">Codex close is explicit</text>
+</svg>

@@ -3,3 +3,6 @@ dist/
 .DS_Store
 *.xcuserdata/
 DerivedData/
+__pycache__/
+*.pyc
+codex-maintenance-*.md

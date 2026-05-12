@@ -1,0 +1,8 @@
+interface:
+  display_name: "Codex Maintenance"
+  short_description: "Keep Codex local state tidy and fast"
+  brand_color: "#2563EB"
+  default_prompt: "Use $codex-maintenance to audit my local Codex state and suggest safe cleanup steps."
+
+policy:
+  allow_implicit_invocation: true

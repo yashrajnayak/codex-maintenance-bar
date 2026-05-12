@@ -3,56 +3,51 @@ set -euo pipefail
 
 MODE="${1:-sync}"
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-DEST="$ROOT_DIR/Sources/CodexMaintenanceBar/Resources/codex_weekly_maintenance.py"
-UPSTREAM_REF="${UPSTREAM_REF:-main}"
-UPSTREAM_RAW_URL="${UPSTREAM_RAW_URL:-https://raw.githubusercontent.com/yashrajnayak/codex-maintenance/$UPSTREAM_REF/codex_weekly_maintenance.py}"
-LOCAL_SOURCE="${LOCAL_SOURCE:-}"
-
-TMP_DIR="$(mktemp -d)"
-trap 'rm -rf "$TMP_DIR"' EXIT
-TMP_SCRIPT="$TMP_DIR/codex_weekly_maintenance.py"
+ROOT_SCRIPT="$ROOT_DIR/codex_weekly_maintenance.py"
+APP_SCRIPT="$ROOT_DIR/Sources/CodexMaintenanceBar/Resources/codex_weekly_maintenance.py"
+SKILL_SCRIPT="$ROOT_DIR/codex-maintenance/scripts/codex_weekly_maintenance.py"
 
 usage() {
   echo "usage: $0 [sync|--check]" >&2
   echo "" >&2
-  echo "Environment:" >&2
-  echo "  LOCAL_SOURCE=/path/to/codex-maintenance  Use a local checkout instead of GitHub raw." >&2
-  echo "  UPSTREAM_REF=main                         Git ref to fetch from upstream." >&2
-  echo "  UPSTREAM_RAW_URL=https://...              Full raw script URL override." >&2
+  echo "Copies the canonical root maintenance script into the app bundle and Codex skill." >&2
 }
 
-fetch_source() {
-  if [[ -n "$LOCAL_SOURCE" ]]; then
-    if [[ -f "$LOCAL_SOURCE/codex_weekly_maintenance.py" ]]; then
-      cp "$LOCAL_SOURCE/codex_weekly_maintenance.py" "$TMP_SCRIPT"
-      return
-    fi
-
-    if [[ -f "$LOCAL_SOURCE/codex-maintenance/scripts/codex_weekly_maintenance.py" ]]; then
-      cp "$LOCAL_SOURCE/codex-maintenance/scripts/codex_weekly_maintenance.py" "$TMP_SCRIPT"
-      return
-    fi
-
-    echo "Could not find codex_weekly_maintenance.py under LOCAL_SOURCE=$LOCAL_SOURCE" >&2
+require_root_script() {
+  if [[ ! -f "$ROOT_SCRIPT" ]]; then
+    echo "Missing canonical script: $ROOT_SCRIPT" >&2
     exit 2
   fi
-
-  curl -fsSL "$UPSTREAM_RAW_URL" -o "$TMP_SCRIPT"
 }
 
-fetch_source
+check_copy() {
+  local label="$1"
+  local path="$2"
+
+  if [[ ! -f "$path" ]]; then
+    echo "Missing $label script copy: $path" >&2
+    return 1
+  fi
+
+  if ! cmp -s "$ROOT_SCRIPT" "$path"; then
+    echo "$label script copy is out of sync with $ROOT_SCRIPT" >&2
+    return 1
+  fi
+}
+
+require_root_script
 
 case "$MODE" in
   sync)
-    cp "$TMP_SCRIPT" "$DEST"
-    chmod +x "$DEST"
-    echo "Synced maintenance script from $UPSTREAM_RAW_URL"
+    cp "$ROOT_SCRIPT" "$APP_SCRIPT"
+    cp "$ROOT_SCRIPT" "$SKILL_SCRIPT"
+    chmod +x "$ROOT_SCRIPT" "$APP_SCRIPT" "$SKILL_SCRIPT"
+    echo "Synced app and skill script copies from $ROOT_SCRIPT"
     ;;
   --check|check)
-    if cmp -s "$TMP_SCRIPT" "$DEST"; then
-      echo "Bundled maintenance script is in sync."
+    if check_copy "App bundle" "$APP_SCRIPT" && check_copy "Codex skill" "$SKILL_SCRIPT"; then
+      echo "Maintenance script copies are in sync."
     else
-      echo "Bundled maintenance script is out of sync with $UPSTREAM_RAW_URL" >&2
       echo "Run: $0 sync" >&2
       exit 1
     fi
