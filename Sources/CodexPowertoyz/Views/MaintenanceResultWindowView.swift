@@ -251,6 +251,14 @@ private struct MaintenanceReportPresentation {
   }
 
   private static func displayValue(_ value: String, key: String) -> String {
+    if key.localizedCaseInsensitiveContains("mode") {
+      if value == "dry-run" {
+        return "Dry run (no changes made)"
+      }
+      if value == "apply" {
+        return "Apply (changes made)"
+      }
+    }
     let digits = value.components(separatedBy: CharacterSet.decimalDigits.inverted).joined()
     if key.localizedCaseInsensitiveContains("bytes"), let bytes = Int64(digits) {
       return "\(ByteCountFormatter.string(fromByteCount: bytes, countStyle: .file)) (\(bytes) bytes)"

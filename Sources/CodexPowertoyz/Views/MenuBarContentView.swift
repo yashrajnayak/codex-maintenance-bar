@@ -125,10 +125,10 @@ struct MenuBarContentView: View {
 
   @ViewBuilder
   private var archivedChatSection: some View {
-    Button("Audit Archived Chats", action: runner.runArchivedAudit)
+    Button("Preview Archived Chat Prune", action: runner.runArchivedAudit)
     .disabled(runner.isRunning)
 
-    Button("Prune Archived Chats", action: runArchivedPruneAfterConfirmation)
+    Button("Prune Archived Chats...", action: runArchivedPruneAfterConfirmation)
     .disabled(runner.isRunning)
   }
 
@@ -218,7 +218,7 @@ struct MenuBarContentView: View {
   private func runArchivedPruneAfterConfirmation() {
     if confirm(
       title: "Prune archived chats?",
-      message: "This closes Codex, backs up archived transcripts and state, removes archived chat records, and verifies the database afterward."
+      message: "This is the destructive action. It closes Codex, backs up archived transcripts and state, removes archived chat records, and verifies the database afterward."
     ) {
       runner.runArchivedPrune()
     }
