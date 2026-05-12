@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-LABEL="io.github.yashrajnayak.codex-maintenance.weekly"
+LABEL="io.github.yashrajnayak.codex-powertoyz.weekly-maintenance"
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-SUPPORT_DIR="$HOME/Library/Application Support/CodexMaintenanceBar"
+SUPPORT_DIR="$HOME/Library/Application Support/codex-powertoyz"
 LAUNCH_AGENTS_DIR="$HOME/Library/LaunchAgents"
-SCRIPT_SOURCE="$ROOT_DIR/Sources/CodexMaintenanceBar/Resources/codex_weekly_maintenance.py"
+SCRIPT_SOURCE="$ROOT_DIR/Sources/CodexPowertoyz/Resources/codex_weekly_maintenance.py"
 SCRIPT_DEST="$SUPPORT_DIR/codex_weekly_maintenance.py"
 PLIST="$LAUNCH_AGENTS_DIR/$LABEL.plist"
 STDOUT_LOG="$SUPPORT_DIR/weekly-cleanup.out.log"

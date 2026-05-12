@@ -3,16 +3,16 @@
 import PackageDescription
 
 let package = Package(
-  name: "CodexMaintenanceBar",
+  name: "codex-powertoyz",
   platforms: [
     .macOS(.v14)
   ],
   products: [
-    .executable(name: "CodexMaintenanceBar", targets: ["CodexMaintenanceBar"])
+    .executable(name: "codex-powertoyz", targets: ["CodexPowertoyz"])
   ],
   targets: [
     .executableTarget(
-      name: "CodexMaintenanceBar",
+      name: "CodexPowertoyz",
       resources: [
         .copy("Resources")
       ]

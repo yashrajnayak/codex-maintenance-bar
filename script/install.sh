@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-APP_NAME="CodexMaintenanceBar"
+APP_NAME="codex-powertoyz"
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 INSTALL_DIR="${1:-$HOME/Applications}"
 APP_BUNDLE="$ROOT_DIR/dist/$APP_NAME.app"

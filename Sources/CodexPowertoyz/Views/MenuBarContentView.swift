@@ -4,9 +4,14 @@ import SwiftUI
 struct MenuBarContentView: View {
   @ObservedObject var runner: MaintenanceRunner
   @ObservedObject var schedule: ScheduleManager
+  @ObservedObject var awake: CodexAwakeModel
 
   var body: some View {
     statusSection
+
+    Divider()
+
+    awakeSection
 
     Divider()
 
@@ -45,11 +50,59 @@ struct MenuBarContentView: View {
     Text(runner.statusText)
       .font(.caption)
 
+    Text(awake.statusText)
+      .font(.caption)
+
+    Text(awake.codexStatusText)
+      .font(.caption)
+
     Text(schedule.statusText)
       .font(.caption)
 
     Text(schedule.loginStatusText)
       .font(.caption)
+  }
+
+  @ViewBuilder
+  private var awakeSection: some View {
+    Toggle(isOn: Binding(
+      get: { awake.autoWhileCodexRuns },
+      set: { awake.setAutoWhileCodexRuns($0) }
+    )) {
+      Label("Auto While Codex Runs", systemImage: "bolt.horizontal")
+    }
+
+    Button {
+      awake.startManualSession(.indefinite)
+    } label: {
+      Label("Keep Awake Until Stopped", systemImage: "play.fill")
+    }
+    .disabled(awake.caffeinate.isRunning)
+
+    Button {
+      awake.startManualSession(.timed(60 * 60))
+    } label: {
+      Label("Keep Awake for 1 Hour", systemImage: "clock")
+    }
+
+    Button {
+      awake.startManualSession(.timed(2 * 60 * 60))
+    } label: {
+      Label("Keep Awake for 2 Hours", systemImage: "clock.fill")
+    }
+
+    Button {
+      awake.stopSession()
+    } label: {
+      Label(awake.stopTitle, systemImage: "stop.fill")
+    }
+    .disabled(!awake.caffeinate.isRunning)
+
+    Button {
+      openLockScreenSettings()
+    } label: {
+      Label("Open Lock Screen Settings", systemImage: "gearshape")
+    }
   }
 
   @ViewBuilder
@@ -164,5 +217,12 @@ struct MenuBarContentView: View {
     ) {
       runner.runArchivedPrune()
     }
+  }
+
+  private func openLockScreenSettings() {
+    guard let url = URL(string: "x-apple.systempreferences:com.apple.Lock-Screen-Settings.extension") else {
+      return
+    }
+    NSWorkspace.shared.open(url)
   }
 }

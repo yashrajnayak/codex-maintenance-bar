@@ -4,7 +4,7 @@ set -euo pipefail
 MODE="${1:-sync}"
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 ROOT_SCRIPT="$ROOT_DIR/codex_weekly_maintenance.py"
-APP_SCRIPT="$ROOT_DIR/Sources/CodexMaintenanceBar/Resources/codex_weekly_maintenance.py"
+APP_SCRIPT="$ROOT_DIR/Sources/CodexPowertoyz/Resources/codex_weekly_maintenance.py"
 SKILL_SCRIPT="$ROOT_DIR/codex-maintenance/scripts/codex_weekly_maintenance.py"
 
 usage() {

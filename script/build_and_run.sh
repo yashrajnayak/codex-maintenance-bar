@@ -2,8 +2,8 @@
 set -euo pipefail
 
 MODE="${1:-run}"
-APP_NAME="CodexMaintenanceBar"
-BUNDLE_ID="io.github.yashrajnayak.CodexMaintenanceBar"
+APP_NAME="codex-powertoyz"
+BUNDLE_ID="io.github.yashrajnayak.codex-powertoyz"
 MIN_SYSTEM_VERSION="14.0"
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -24,7 +24,7 @@ rm -rf "$APP_BUNDLE"
 mkdir -p "$APP_MACOS" "$APP_RESOURCES"
 cp "$BUILD_BINARY" "$APP_BINARY"
 chmod +x "$APP_BINARY"
-cp "$ROOT_DIR"/Sources/CodexMaintenanceBar/Resources/*.py "$APP_RESOURCES/"
+cp "$ROOT_DIR"/Sources/CodexPowertoyz/Resources/*.py "$APP_RESOURCES/"
 chmod +x "$APP_RESOURCES"/*.py
 
 cat >"$INFO_PLIST" <<PLIST
@@ -37,7 +37,7 @@ cat >"$INFO_PLIST" <<PLIST
   <key>CFBundleIdentifier</key>
   <string>$BUNDLE_ID</string>
   <key>CFBundleName</key>
-  <string>Codex Maintenance Bar</string>
+  <string>codex-powertoyz</string>
   <key>CFBundlePackageType</key>
   <string>APPL</string>
   <key>LSMinimumSystemVersion</key>

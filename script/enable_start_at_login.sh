@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-LABEL="io.github.yashrajnayak.codex-maintenance-bar.login"
-APP_PATH="${1:-$HOME/Applications/CodexMaintenanceBar.app}"
+LABEL="io.github.yashrajnayak.codex-powertoyz.login"
+APP_PATH="${1:-$HOME/Applications/codex-powertoyz.app}"
 LAUNCH_AGENTS_DIR="$HOME/Library/LaunchAgents"
 PLIST="$LAUNCH_AGENTS_DIR/$LABEL.plist"
 DOMAIN="gui/$(id -u)"

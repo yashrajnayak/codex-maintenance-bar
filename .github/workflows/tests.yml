@@ -15,6 +15,6 @@ jobs:
         with:
           python-version: "3.11"
       - name: Compile
-        run: python -m py_compile codex_weekly_maintenance.py codex-maintenance/scripts/codex_weekly_maintenance.py Sources/CodexMaintenanceBar/Resources/*.py tests/test_codex_weekly_maintenance.py
+        run: python -m py_compile codex_weekly_maintenance.py codex-maintenance/scripts/codex_weekly_maintenance.py Sources/CodexPowertoyz/Resources/*.py tests/test_codex_weekly_maintenance.py
       - name: Test
         run: python -m unittest discover -s tests -v

@@ -9,8 +9,8 @@ final class ScheduleManager: ObservableObject {
   @Published private(set) var loginStatusText = "Start at login off"
 
   private let fileManager = FileManager.default
-  private let label = "io.github.yashrajnayak.codex-maintenance.weekly"
-  private let loginLabel = "io.github.yashrajnayak.codex-maintenance-bar.login"
+  private let label = "io.github.yashrajnayak.codex-powertoyz.weekly-maintenance"
+  private let loginLabel = "io.github.yashrajnayak.codex-powertoyz.login"
 
   init() {
     refresh()
@@ -107,7 +107,7 @@ final class ScheduleManager: ObservableObject {
 
   private var supportDirectory: URL {
     fileManager.homeDirectoryForCurrentUser
-      .appendingPathComponent("Library/Application Support/CodexMaintenanceBar")
+      .appendingPathComponent("Library/Application Support/codex-powertoyz")
   }
 
   private var plistURL: URL {

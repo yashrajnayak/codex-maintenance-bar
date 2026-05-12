@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-LABEL="io.github.yashrajnayak.codex-maintenance-bar.login"
+LABEL="io.github.yashrajnayak.codex-powertoyz.login"
 PLIST="$HOME/Library/LaunchAgents/$LABEL.plist"
 DOMAIN="gui/$(id -u)"
 

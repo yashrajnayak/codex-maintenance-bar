@@ -18,6 +18,13 @@ final class MaintenanceRunner: ObservableObject {
     return false
   }
 
+  var didFail: Bool {
+    if case .failed = state {
+      return true
+    }
+    return false
+  }
+
   var menuTitle: String {
     switch state {
     case .idle:
