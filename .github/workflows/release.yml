@@ -1,0 +1,49 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  macos-release:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Check script copies match
+        run: ./script/sync_maintenance_script.sh --check
+
+      - name: Check shell scripts
+        run: bash -n script/*.sh
+
+      - name: Check Python scripts
+        run: python3 -m py_compile codex_weekly_maintenance.py codex-maintenance/scripts/codex_weekly_maintenance.py Sources/CodexPowertoyz/Resources/*.py tests/*.py
+
+      - name: Run Python tests
+        run: python3 -m unittest discover -s tests -v
+
+      - name: Package app
+        run: ./script/package_release.sh "$GITHUB_REF_NAME"
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: codex-powertoyz-macos
+          path: |
+            dist/release/codex-powertoyz-macos.zip
+            dist/release/checksums.txt
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            dist/release/codex-powertoyz-macos.zip \
+            dist/release/checksums.txt \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "codex-powertoyz $GITHUB_REF_NAME" \
+            --generate-notes

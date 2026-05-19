@@ -8,15 +8,17 @@ This is an unofficial local utility and is not affiliated with OpenAI.
 
 ## Architecture
 
-![codex-powertoyz architecture: the menu bar app coordinates awake controls, Codex detection, bundled maintenance helpers, backups, reports, weekly scheduling, local Codex state, archived sessions, and workspace artifacts.](assets/readme/architecture-diagram.png)
+![codex-powertoyz architecture: the menu bar app coordinates awake controls, Codex detection, bundled maintenance helpers, backups, reports, weekly scheduling, GitHub Release packaging, local Codex state, archived sessions, workspace artifacts, and cache artifacts.](assets/readme/architecture-diagram.png)
 
 `codex-powertoyz` combines a few focused local tools:
 
 - `Sources/CodexPowertoyz`: SwiftUI menu bar app.
-- `Sources/CodexPowertoyz/Resources/`: bundled weekly, workspace-artifact, and archived-chat cleanup helpers.
+- `Sources/CodexPowertoyz/Resources/`: bundled weekly, workspace-artifact, Codex-cache, and archived-chat cleanup helpers.
 - `codex_weekly_maintenance.py`: standalone weekly maintenance script for CLI use.
 - `codex-maintenance/`: installable Codex skill with its own weekly maintenance script copy.
 - `script/sync_maintenance_script.sh`: keeps weekly maintenance script copies identical.
+- `script/package_release.sh`: builds a release-mode app bundle and zips it for GitHub Releases.
+- `script/install_release.sh`: downloads the latest release zip, installs the app, and optionally enables start at login.
 - `tests/`: regression tests for audit, cleanup, restore, and lock behavior.
 
 The app launches bundled Python helpers for manual audits and cleanups, wraps macOS `caffeinate` for awake sessions, and can install a user LaunchAgent for weekly maintenance.
@@ -31,6 +33,8 @@ The app launches bundled Python helpers for manual audits and cleanups, wraps ma
 - `Cleanup Now`: closes Codex first, backs up state, archives stale active sessions, rotates logs, prunes dead config paths, writes a report, and shows a native result window when finished.
 - `Audit Workspace Artifacts`: dry-runs a manifest-backed pass over `~/Documents/Codex` for regenerable build/dependency/cache folders, exact duplicate older version files, and derived page renders.
 - `Clean Workspace Artifacts`: removes only those generated workspace artifacts after writing a CSV manifest and Markdown report.
+- `Audit Codex Cache`: dry-runs high-confidence cleanup candidates under `~/.codex`, including old maintenance backups, old rotated log archives, rebuildable `.tmp` cache, and orphan generated images.
+- `Clean Codex Cache...`: moves those high-confidence cache candidates into a timestamped macOS Trash folder after writing a CSV manifest and Markdown report.
 - `Preview Archived Chat Prune`: dry-run preview of archived chat transcript removal and how much space archived transcripts use.
 - `Prune Archived Chats...`: closes Codex, backs up archived transcripts and state, removes archived chat transcript files, deletes archived rows from the local state database, updates the session index, and verifies database integrity.
 - `Enable Weekly Cleanup`: installs a macOS LaunchAgent that runs cleanup every Monday at 9:00 AM.
@@ -55,11 +59,48 @@ Codex Desktop can feel slower when local active history, session transcripts, lo
 
 Cleanup helps by closing Codex first, backing up local state, archiving old non-pinned active chats, updating the local state database, creating handoff docs, moving stale workspaces to an archive folder, rotating oversized logs, and pruning config entries for missing paths.
 
-The artifact tools handle cleanup work that weekly maintenance intentionally avoids: regenerable workspace build folders, virtual environments, Python caches, exact duplicate older version files, derived page-render folders when a final PDF/PPTX exists, and archived chat transcripts after a dedicated backup.
+The artifact tools handle cleanup work that weekly maintenance intentionally avoids: regenerable workspace build folders, virtual environments, Python caches, exact duplicate older version files, derived page-render folders when a final PDF/PPTX exists, high-confidence Codex cache artifacts, and archived chat transcripts after a dedicated backup.
+
+Codex cache cleanup is intentionally narrow and reversible. It keeps the newest general maintenance backup, newest archived-chat-prune backup, and newest rotated-log archive, then moves older restore/log snapshots, rebuildable `.codex/.tmp` children, and `generated_images` folders with no matching thread row into a timestamped folder under `~/.Trash`.
 
 This does not change model speed, network latency, cloud service behavior, or the size of the currently open chat before it is archived. It reports heavy background Node/dev-server processes, but it does not kill them automatically.
 
 ## Install
+
+### Recommended: Latest GitHub Release
+
+Install the latest release with one command:
+
+```sh
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/yashrajnayak/codex-powertoyz/main/script/install_release.sh)"
+```
+
+This downloads `codex-powertoyz-macos.zip` from the latest GitHub Release, installs the app to:
+
+```text
+~/Applications/codex-powertoyz.app
+```
+
+opens it, and enables start at login. Look for the wand icon near the clock.
+
+Useful installer options:
+
+```sh
+# install without enabling start at login
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/yashrajnayak/codex-powertoyz/main/script/install_release.sh)" -- --no-login
+
+# install a specific release tag
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/yashrajnayak/codex-powertoyz/main/script/install_release.sh)" -- --version v0.1.0
+
+# install somewhere else
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/yashrajnayak/codex-powertoyz/main/script/install_release.sh)" -- --install-dir /Applications
+```
+
+You can also download `codex-powertoyz-macos.zip` from the latest GitHub Release, unzip it, and move `codex-powertoyz.app` into `~/Applications` or `/Applications`.
+
+Release builds are ad-hoc signed but not Apple notarized yet. If macOS blocks a browser-downloaded copy, right-click the app in Finder and choose `Open`; future notarized releases should remove that extra first-launch step.
+
+### From Source
 
 From this repo:
 
@@ -74,6 +115,23 @@ This builds the app, installs it to:
 ```
 
 and opens it. `install.sh` also enables start at login, so the menu bar app reappears after a restart.
+
+## Publishing a Release
+
+Create and push a version tag:
+
+```sh
+git tag v0.1.0
+git push origin v0.1.0
+```
+
+The `Release` GitHub Actions workflow runs validation, builds a release-mode app bundle, ad-hoc signs it, packages `dist/release/codex-powertoyz-macos.zip`, writes `dist/release/checksums.txt`, and uploads both files to a GitHub Release.
+
+You can produce the same release files locally:
+
+```sh
+./script/package_release.sh v0.1.0
+```
 
 ## Reopen After Quitting
 
@@ -145,6 +203,18 @@ Clean generated workspace artifacts:
 
 ```sh
 python3 Sources/CodexPowertoyz/Resources/codex_workspace_artifact_cleanup.py --apply --include-derived-page-renders
+```
+
+Preview high-confidence Codex cache artifacts:
+
+```sh
+python3 Sources/CodexPowertoyz/Resources/codex_cache_cleanup.py
+```
+
+Move high-confidence Codex cache artifacts to Trash:
+
+```sh
+python3 Sources/CodexPowertoyz/Resources/codex_cache_cleanup.py --apply
 ```
 
 Preview archived chat pruning:

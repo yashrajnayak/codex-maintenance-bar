@@ -112,7 +112,7 @@ drawText(
   weight: .bold
 )
 drawText(
-  "Menu bar controls for awake sessions, Codex maintenance, backups, reports, and scheduled cleanup",
+  "Menu bar controls for awake sessions, Codex maintenance, cache cleanup, backups, reports, scheduling, and releases",
   in: NSRect(x: 190, y: 724, width: 1220, height: 38),
   size: 22,
   weight: .regular,
@@ -140,7 +140,7 @@ let topBoxes = [
   ),
   Box(
     title: "Schedule",
-    subtitle: "Weekly LaunchAgent",
+    subtitle: "Weekly and login LaunchAgents",
     rect: NSRect(x: 1120, y: 470, width: 280, height: 150),
     fill: NSColor(calibratedRed: 0.98, green: 0.93, blue: 0.99, alpha: 1)
   )
@@ -149,21 +149,27 @@ let topBoxes = [
 let bottomBoxes = [
   Box(
     title: "Codex State",
-    subtitle: "Sessions, logs, config, workspaces",
-    rect: NSRect(x: 250, y: 230, width: 300, height: 150),
+    subtitle: "Sessions, logs, cache, config",
+    rect: NSRect(x: 90, y: 230, width: 270, height: 150),
     fill: NSColor(calibratedRed: 0.98, green: 0.95, blue: 0.88, alpha: 1)
   ),
   Box(
     title: "Backups",
     subtitle: "State DBs, transcripts, manifests",
-    rect: NSRect(x: 650, y: 230, width: 300, height: 150),
+    rect: NSRect(x: 470, y: 230, width: 270, height: 150),
     fill: NSColor(calibratedRed: 0.91, green: 0.96, blue: 1.00, alpha: 1)
   ),
   Box(
     title: "Reports",
     subtitle: "Markdown summaries and next steps",
-    rect: NSRect(x: 1050, y: 230, width: 300, height: 150),
+    rect: NSRect(x: 850, y: 230, width: 270, height: 150),
     fill: NSColor(calibratedRed: 0.94, green: 0.98, blue: 0.92, alpha: 1)
+  ),
+  Box(
+    title: "Release Zip",
+    subtitle: "Tagged GitHub uploads",
+    rect: NSRect(x: 1230, y: 230, width: 270, height: 150),
+    fill: NSColor(calibratedRed: 1.00, green: 0.94, blue: 0.91, alpha: 1)
   )
 ]
 
@@ -174,9 +180,10 @@ for box in topBoxes + bottomBoxes {
 drawArrow(from: NSPoint(x: 350, y: 545), to: NSPoint(x: 420, y: 545))
 drawArrow(from: NSPoint(x: 700, y: 545), to: NSPoint(x: 770, y: 545))
 drawArrow(from: NSPoint(x: 1050, y: 545), to: NSPoint(x: 1120, y: 545))
-drawArrow(from: NSPoint(x: 910, y: 470), to: NSPoint(x: 480, y: 380))
-drawArrow(from: NSPoint(x: 910, y: 470), to: NSPoint(x: 800, y: 380))
-drawArrow(from: NSPoint(x: 910, y: 470), to: NSPoint(x: 1180, y: 380))
+drawArrow(from: NSPoint(x: 910, y: 470), to: NSPoint(x: 280, y: 380))
+drawArrow(from: NSPoint(x: 910, y: 470), to: NSPoint(x: 620, y: 380))
+drawArrow(from: NSPoint(x: 910, y: 470), to: NSPoint(x: 985, y: 380))
+drawArrow(from: NSPoint(x: 1260, y: 470), to: NSPoint(x: 1365, y: 380))
 
 let noteRect = NSRect(x: 250, y: 88, width: 1100, height: 88)
 let notePath = NSBezierPath(roundedRect: noteRect, xRadius: 16, yRadius: 16)
@@ -187,7 +194,7 @@ notePath.lineWidth = 2
 notePath.stroke()
 
 drawText(
-  "Read-only audits come first. Cleanup actions write reports, keep manifests, and back up local Codex state before destructive changes.",
+  "Read-only audits come first. Cleanup actions write reports, keep manifests, and back up local Codex state; tagged releases ship a zipped app bundle.",
   in: NSRect(x: noteRect.minX + 62, y: noteRect.minY + 25, width: noteRect.width - 124, height: 42),
   size: 18,
   weight: .medium,

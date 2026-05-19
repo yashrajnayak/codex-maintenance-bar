@@ -5,6 +5,8 @@ enum MaintenanceMode: String {
   case cleanup
   case artifactAudit
   case artifactCleanup
+  case cacheAudit
+  case cacheCleanup
   case archivedAudit
   case archivedPrune
 
@@ -18,6 +20,10 @@ enum MaintenanceMode: String {
       return "Artifact Audit"
     case .artifactCleanup:
       return "Artifact Cleanup"
+    case .cacheAudit:
+      return "Cache Audit"
+    case .cacheCleanup:
+      return "Cache Cleanup"
     case .archivedAudit:
       return "Archived Chat Audit"
     case .archivedPrune:
