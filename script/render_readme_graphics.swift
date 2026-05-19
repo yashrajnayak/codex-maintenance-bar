@@ -112,7 +112,7 @@ drawText(
   weight: .bold
 )
 drawText(
-  "Menu bar controls for awake sessions, Codex maintenance, backups, reports, and scheduled cleanup",
+  "Menu bar controls for awake sessions, Codex maintenance, cache cleanup, backups, reports, and scheduling",
   in: NSRect(x: 190, y: 724, width: 1220, height: 38),
   size: 22,
   weight: .regular,
@@ -149,7 +149,7 @@ let topBoxes = [
 let bottomBoxes = [
   Box(
     title: "Codex State",
-    subtitle: "Sessions, logs, config, workspaces",
+    subtitle: "Sessions, logs, cache, config",
     rect: NSRect(x: 250, y: 230, width: 300, height: 150),
     fill: NSColor(calibratedRed: 0.98, green: 0.95, blue: 0.88, alpha: 1)
   ),

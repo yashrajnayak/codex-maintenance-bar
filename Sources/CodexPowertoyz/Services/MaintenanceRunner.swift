@@ -72,6 +72,14 @@ final class MaintenanceRunner: ObservableObject {
     run(.artifactCleanup)
   }
 
+  func runCacheAudit() {
+    run(.cacheAudit)
+  }
+
+  func runCacheCleanup() {
+    run(.cacheCleanup)
+  }
+
   func runArchivedAudit() {
     run(.archivedAudit)
   }
@@ -211,6 +219,10 @@ final class MaintenanceRunner: ObservableObject {
       return [scriptURL.path, "--include-derived-page-renders"]
     case .artifactCleanup:
       return [scriptURL.path, "--apply", "--include-derived-page-renders"]
+    case .cacheAudit:
+      return [scriptURL.path]
+    case .cacheCleanup:
+      return [scriptURL.path, "--apply"]
     case .archivedAudit:
       return [scriptURL.path]
     case .archivedPrune:
@@ -242,6 +254,8 @@ final class MaintenanceRunner: ObservableObject {
       return "codex_weekly_maintenance"
     case .artifactAudit, .artifactCleanup:
       return "codex_workspace_artifact_cleanup"
+    case .cacheAudit, .cacheCleanup:
+      return "codex_cache_cleanup"
     case .archivedAudit, .archivedPrune:
       return "codex_archived_chat_prune"
     }

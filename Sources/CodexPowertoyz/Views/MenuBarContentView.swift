@@ -23,6 +23,10 @@ struct MenuBarContentView: View {
 
     Divider()
 
+    cacheSection
+
+    Divider()
+
     archivedChatSection
 
     Divider()
@@ -124,6 +128,15 @@ struct MenuBarContentView: View {
   }
 
   @ViewBuilder
+  private var cacheSection: some View {
+    Button("Audit Codex Cache", action: runner.runCacheAudit)
+    .disabled(runner.isRunning)
+
+    Button("Clean Codex Cache...", action: runCacheCleanupAfterConfirmation)
+    .disabled(runner.isRunning)
+  }
+
+  @ViewBuilder
   private var archivedChatSection: some View {
     Button("Preview Archived Chat Prune", action: runner.runArchivedAudit)
     .disabled(runner.isRunning)
@@ -212,6 +225,15 @@ struct MenuBarContentView: View {
       message: "This removes regenerable build folders, virtualenvs, caches, duplicate older version files, and derived page renders after writing a manifest."
     ) {
       runner.runArtifactCleanup()
+    }
+  }
+
+  private func runCacheCleanupAfterConfirmation() {
+    if confirm(
+      title: "Clean Codex cache?",
+      message: "This moves old maintenance backups, old rotated log archives, rebuildable Codex temp cache, and orphan generated images into a timestamped Trash folder after writing a manifest."
+    ) {
+      runner.runCacheCleanup()
     }
   }
 
