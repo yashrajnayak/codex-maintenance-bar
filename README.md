@@ -8,7 +8,7 @@ This is an unofficial local utility and is not affiliated with OpenAI.
 
 ## Architecture
 
-![codex-powertoyz architecture: the menu bar app coordinates awake controls, Codex detection, bundled maintenance helpers, backups, reports, weekly scheduling, local Codex state, archived sessions, workspace artifacts, and cache artifacts.](assets/readme/architecture-diagram.png)
+![codex-powertoyz architecture: the menu bar app coordinates awake controls, Codex detection, bundled maintenance helpers, backups, reports, weekly scheduling, GitHub Release packaging, local Codex state, archived sessions, workspace artifacts, and cache artifacts.](assets/readme/architecture-diagram.png)
 
 `codex-powertoyz` combines a few focused local tools:
 
@@ -17,6 +17,8 @@ This is an unofficial local utility and is not affiliated with OpenAI.
 - `codex_weekly_maintenance.py`: standalone weekly maintenance script for CLI use.
 - `codex-maintenance/`: installable Codex skill with its own weekly maintenance script copy.
 - `script/sync_maintenance_script.sh`: keeps weekly maintenance script copies identical.
+- `script/package_release.sh`: builds a release-mode app bundle and zips it for GitHub Releases.
+- `script/install_release.sh`: downloads the latest release zip, installs the app, and optionally enables start at login.
 - `tests/`: regression tests for audit, cleanup, restore, and lock behavior.
 
 The app launches bundled Python helpers for manual audits and cleanups, wraps macOS `caffeinate` for awake sessions, and can install a user LaunchAgent for weekly maintenance.
@@ -65,6 +67,41 @@ This does not change model speed, network latency, cloud service behavior, or th
 
 ## Install
 
+### Recommended: Latest GitHub Release
+
+Install the latest release with one command:
+
+```sh
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/yashrajnayak/codex-powertoyz/main/script/install_release.sh)"
+```
+
+This downloads `codex-powertoyz-macos.zip` from the latest GitHub Release, installs the app to:
+
+```text
+~/Applications/codex-powertoyz.app
+```
+
+opens it, and enables start at login. Look for the wand icon near the clock.
+
+Useful installer options:
+
+```sh
+# install without enabling start at login
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/yashrajnayak/codex-powertoyz/main/script/install_release.sh)" -- --no-login
+
+# install a specific release tag
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/yashrajnayak/codex-powertoyz/main/script/install_release.sh)" -- --version v0.1.0
+
+# install somewhere else
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/yashrajnayak/codex-powertoyz/main/script/install_release.sh)" -- --install-dir /Applications
+```
+
+You can also download `codex-powertoyz-macos.zip` from the latest GitHub Release, unzip it, and move `codex-powertoyz.app` into `~/Applications` or `/Applications`.
+
+Release builds are ad-hoc signed but not Apple notarized yet. If macOS blocks a browser-downloaded copy, right-click the app in Finder and choose `Open`; future notarized releases should remove that extra first-launch step.
+
+### From Source
+
 From this repo:
 
 ```sh
@@ -78,6 +115,23 @@ This builds the app, installs it to:
 ```
 
 and opens it. `install.sh` also enables start at login, so the menu bar app reappears after a restart.
+
+## Publishing a Release
+
+Create and push a version tag:
+
+```sh
+git tag v0.1.0
+git push origin v0.1.0
+```
+
+The `Release` GitHub Actions workflow runs validation, builds a release-mode app bundle, ad-hoc signs it, packages `dist/release/codex-powertoyz-macos.zip`, writes `dist/release/checksums.txt`, and uploads both files to a GitHub Release.
+
+You can produce the same release files locally:
+
+```sh
+./script/package_release.sh v0.1.0
+```
 
 ## Reopen After Quitting
 

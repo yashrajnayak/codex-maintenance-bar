@@ -5,6 +5,9 @@ MODE="${1:-run}"
 APP_NAME="codex-powertoyz"
 BUNDLE_ID="io.github.yashrajnayak.codex-powertoyz"
 MIN_SYSTEM_VERSION="14.0"
+SWIFT_CONFIGURATION="${SWIFT_CONFIGURATION:-debug}"
+APP_VERSION="${APP_VERSION:-0.0.0}"
+BUNDLE_VERSION="${BUNDLE_VERSION:-$APP_VERSION}"
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 DIST_DIR="$ROOT_DIR/dist"
@@ -17,8 +20,8 @@ INFO_PLIST="$APP_CONTENTS/Info.plist"
 
 pkill -x "$APP_NAME" >/dev/null 2>&1 || true
 
-swift build --package-path "$ROOT_DIR"
-BUILD_BINARY="$(swift build --package-path "$ROOT_DIR" --show-bin-path)/$APP_NAME"
+swift build --configuration "$SWIFT_CONFIGURATION" --package-path "$ROOT_DIR"
+BUILD_BINARY="$(swift build --configuration "$SWIFT_CONFIGURATION" --package-path "$ROOT_DIR" --show-bin-path)/$APP_NAME"
 
 rm -rf "$APP_BUNDLE"
 mkdir -p "$APP_MACOS" "$APP_RESOURCES"
@@ -40,6 +43,10 @@ cat >"$INFO_PLIST" <<PLIST
   <string>codex-powertoyz</string>
   <key>CFBundlePackageType</key>
   <string>APPL</string>
+  <key>CFBundleShortVersionString</key>
+  <string>$APP_VERSION</string>
+  <key>CFBundleVersion</key>
+  <string>$BUNDLE_VERSION</string>
   <key>LSMinimumSystemVersion</key>
   <string>$MIN_SYSTEM_VERSION</string>
   <key>LSUIElement</key>
